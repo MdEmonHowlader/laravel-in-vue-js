@@ -45,7 +45,7 @@ class ProductController extends Controller
 
      $validated =$validator->validated();
      $product = Product::create($validated);
-    //  return response()->json(['massage'=>'Product Created Successfully','product'=>$product],200);
+
     return response()->json([
         'message' => 'Product Created Successfully',
         'product' => $product,
@@ -71,16 +71,39 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        //
+        $product= Product::findOrFail($id);
+        $validator=Validator::make($request->all(),[
+            'product_name'=>'required|string',
+            'product_price'=>'required|numeric',
+         ]);
+
+         if($validator->fails()){
+            return response()->json([$validator->errors()->all()],422);
+
+         }
+
+         $validated =$validator->validated();
+         $product->update($validated );
+         return response()->json([
+            'message' => 'Product Update Successfully',
+            'product' => $product,
+        ], 200);
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        //
+        $product= Product::findOrFail($id);
+        $product->delete();
+        return response()->json([
+            'message' => 'Product Delete Successfully',
+
+        ], 200);
+
     }
 }
